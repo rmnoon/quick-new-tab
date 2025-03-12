@@ -1,6 +1,8 @@
 function loadOptions() {
-	var quickTabUrl = localStorage['quickTabUrl'] || '';
-	document.getElementById('quick-tab-url').value = url;
+	chrome.storage.local.get(['quickTabUrl'], function(result) {
+		var quickTabUrl = result.quickTabUrl || '';
+		document.getElementById('quick-tab-url').value = quickTabUrl;
+	});
 }
 
 function saveOptions() {
@@ -8,12 +10,19 @@ function saveOptions() {
 	if (quickTabUrl === '') {
 		quickTabUrl = null;
 	}
-	if (!quickTabUrl) {
-		delete localStorage['quickTabUrl'];
-	} else {
-		localStorage['quickTabUrl'] = quickTabUrl;
-	}
 	
+	if (!quickTabUrl) {
+		chrome.storage.local.remove(['quickTabUrl'], function() {
+			showStatusMessage();
+		});
+	} else {
+		chrome.storage.local.set({quickTabUrl: quickTabUrl}, function() {
+			showStatusMessage();
+		});
+	}
+}
+
+function showStatusMessage() {
 	var statusTextElem = document.getElementById('status-text');
 	statusTextElem.innerHTML = 'Saved!';
 	setTimeout(function() {

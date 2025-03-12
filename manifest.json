@@ -1,7 +1,7 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Quick New Tab",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "short_name": "QuickNewTab",
 
   "description": "Customize your Chrome New Tab page without breaking the UX.",
@@ -14,8 +14,13 @@
   },
   "homepage_url": "https://github.com/rmnoon/quick-new-tab",
 
+  "permissions": ["storage"],
+
   "chrome_url_overrides": {
     "newtab": "newtab.html"
   },
-  "options_page": "options.html"
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  }
 }

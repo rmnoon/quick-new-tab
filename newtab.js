@@ -1,38 +1,49 @@
 window.onload = function() {
-    var quickTabUrl = localStorage['quickTabUrl'];
-    if (quickTabUrl) {
-        chrome.tabs.getCurrent(function (tab) {
-            chrome.tabs.update(tab.id, {
-                url: quickTabUrl,
-                highlighted: true
+    chrome.storage.local.get(['quickTabUrl'], function(result) {
+        var quickTabUrl = result.quickTabUrl;
+        if (quickTabUrl) {
+            chrome.tabs.getCurrent(function (tab) {
+                chrome.tabs.update(tab.id, {
+                    url: quickTabUrl,
+                    highlighted: true
+                });
             });
-        });
-    } else {
-        document.getElementById('options').style['display'] = 'block';
-    }
+        } else {
+            document.getElementById('options').style['display'] = 'block';
+        }
+    });
 };
 
 function loadOptions() {
-	var quickTabUrl = localStorage['quickTabUrl'] || '';
-	document.getElementById('quick-tab-url').value = url;
+    chrome.storage.local.get(['quickTabUrl'], function(result) {
+        var quickTabUrl = result.quickTabUrl || '';
+        document.getElementById('quick-tab-url').value = quickTabUrl;
+    });
 }
 
 function saveOptions() {
-	var quickTabUrl = document.getElementById('quick-tab-url').value;
-	if (quickTabUrl === '') {
-		quickTabUrl = null;
-	}
-	if (!quickTabUrl) {
-		delete localStorage['quickTabUrl'];
-	} else {
-		localStorage['quickTabUrl'] = quickTabUrl;
-	}
-	
-	var statusTextElem = document.getElementById('status-text');
-	statusTextElem.innerHTML = 'Saved!';
-	setTimeout(function() {
-		statusTextElem.innerHTML = '';
-	}, 2000);
+    var quickTabUrl = document.getElementById('quick-tab-url').value;
+    if (quickTabUrl === '') {
+        quickTabUrl = null;
+    }
+    
+    if (!quickTabUrl) {
+        chrome.storage.local.remove(['quickTabUrl'], function() {
+            showStatusMessage();
+        });
+    } else {
+        chrome.storage.local.set({quickTabUrl: quickTabUrl}, function() {
+            showStatusMessage();
+        });
+    }
+}
+
+function showStatusMessage() {
+    var statusTextElem = document.getElementById('status-text');
+    statusTextElem.innerHTML = 'Saved!';
+    setTimeout(function() {
+        statusTextElem.innerHTML = '';
+    }, 2000);
 }
 
 document.addEventListener('DOMContentLoaded', loadOptions);
